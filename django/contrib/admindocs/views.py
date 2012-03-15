@@ -169,7 +169,7 @@ def view_detail(request, view):
 def model_index(request):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
-    m_list = [m._meta for m in models.get_models()]
+    m_list = [m._meta for m in models.get_models() if request.user.has_module_perms(m._meta.app_label)]
     return render_to_response('admin_doc/model_index.html', {
         'root_path': urlresolvers.reverse('admin:index'),
         'models': m_list
