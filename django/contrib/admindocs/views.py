@@ -9,7 +9,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.db import models
 from django.shortcuts import render_to_response
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.http import Http404
+from django.http import Http404,HttpResponseForbidden
 from django.core import urlresolvers
 from django.contrib.admindocs import utils
 from django.contrib.sites.models import Site
@@ -179,6 +179,10 @@ def model_index(request):
 def model_detail(request, app_label, model_name):
     if not utils.docutils_is_available:
         return missing_docutils_page(request)
+
+    #Make sure user can access this model
+    if not request.user.has_module_perms(app_label):
+        raise Http404(_("App %r not found") % app_label)
 
     # Get the model class.
     try:
